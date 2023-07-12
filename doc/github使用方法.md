@@ -82,6 +82,16 @@ git merge mian	//合并
 git push		   //提交到远端
 ```
 
+### 本地多个分支开发
+```sh
+保存当前本地分支的工作区状态
+git stash
+恢复当前本地分支的工作区状态
+git stash pop
+
+```
+![Snipaste_2023-01-23_16-40-26.png](https://img1.imgtp.com/2023/06/06/AEWQmFl6.png)
+
 ### 本地 git 未与 github 进行连接
 
 ```SH
