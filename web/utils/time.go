@@ -3,6 +3,7 @@ package utils
 import (
 	"container/list"
 	"errors"
+	"sync"
 )
 
 type TimerTask struct {
@@ -12,10 +13,15 @@ type TimerTask struct {
 }
 
 type Timer struct {
-	TimeList *list.List //存储定时器
+	TimeList *list.List   //存储定时器
+	Mutex    sync.RWMutex //读写锁
 }
 
-func (t *Timer) AddTimerTaskLock(args *TimerTask, val *int8) error {
+/*功能:添加定时任务
+ *参1:定时任务结构体
+ *参2:任意*int8的值
+ **/
+func (t *Timer) AddTimerTask(args *TimerTask, val *int8) error {
 	if args == nil {
 		return errors.New("invalid args")
 	}
@@ -25,35 +31,63 @@ func (t *Timer) AddTimerTaskLock(args *TimerTask, val *int8) error {
 	task.Task = args.Task
 	task.RealTime = 0
 
-	//TODO insert
+	index, err := t.findLowerBound(task)
+	if err != nil {
+		return errors.New("FindLowerBoundLock fail")
+	}
+	if index != nil {
+		t.TimeList.InsertBefore(task, index)
+	}
 
 	return nil
 }
 
-// check
-func (t *Timer) FindLowerBoundLock(task *TimerTask) (*TimerTask, error) { //可算法优化
-	//TODO lock
+// 暂且只支持最小粒度为1s的心跳，待突破
+func (t *Timer) findLowerBound(task *TimerTask) (*list.Element, error) { //可算法优化
 	if task != nil && task.Time < 0 {
 		//TODO执行
 	}
+
+	t.Mutex.Lock()
+	defer t.Mutex.Unlock()
+
+	//开头
 	if t.TimeList.Front() == nil {
 		t.TimeList.Init()
 		task.RealTime = task.Time
 		t.TimeList.PushBack(task)
-		return task, nil //TODO在开头 //task前插入task
+		return nil, nil
 	}
 
+	//中间
 	var last int32 = 0
 	for i := t.TimeList.Front(); i != t.TimeList.Back(); i = i.Next() {
 		current, ok := i.Value.(*TimerTask)
-		task.RealTime = task.Time - last
-
 		if ok {
 			return nil, errors.New("type error")
 		}
-		if task.RealTime <= current.RealTime {
-			return current, nil //TODO在中间
+		task.RealTime = task.Time - last
+		if task.RealTime < current.RealTime {
+			current.RealTime -= task.RealTime
+			return i, nil
 		}
+		last += current.RealTime
 	}
-	return nil, nil //TODO末尾
+
+	//结尾
+	task.RealTime = task.Time - last
+	t.TimeList.PushBack(task)
+	return nil, nil
 }
+
+// func (t *Timer) ExecTimer() (int32, error) {
+// }
+
+// 待突破部分
+// if i == t.TimeList.Front() {
+// 	times, err := t.SignalTime() //insertFront()//current.RealTime -= //已经运行的时间
+// 	if err != nil {
+// 		return nil, errors.New("SignalTime fail")
+// 	}
+// 	current.RealTime -= times
+// }
