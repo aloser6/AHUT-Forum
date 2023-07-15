@@ -22,10 +22,9 @@ func (y *Yaml) ReadYaml() string {
 //如果输入的key不存在则增
 //如果输入的value为空则删除
 //如果输入的key存在则修改
-func (y *Yaml) SetYaml(value string) {
+func (y *Yaml) SetYaml() {
 	config := viper.New()
 	InitReadconfig(config)
-	y.Value = value
 	config.Set(y.Key, y.Value)
 	InitSetconfig(config)
 }
