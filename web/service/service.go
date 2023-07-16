@@ -33,7 +33,7 @@ func (c *Centre) Register(args Service, val *int8) error { //参数优化val
 	if args.Ip == "" || args.Port < 0 {
 		return errors.New("invalid args")
 	}
-	if args.isLive == true {
+	if args.isLive {
 		return errors.New("already registered service")
 	}
 
@@ -42,7 +42,7 @@ func (c *Centre) Register(args Service, val *int8) error { //参数优化val
 	defer c.Mutex.Unlock()
 	c.IsLock = true
 
-	if _, ok := c.Index[args.Sname]; ok == true {
+	if _, ok := c.Index[args.Sname]; ok {
 		c.IsLock = false
 		return errors.New("name repeat")
 	}
@@ -68,7 +68,7 @@ func (c *Centre) Discover(name string, val *Service) error { //读写锁
 	c.Mutex.RLock()
 	defer c.Mutex.RUnlock()
 	index, err := c.Index[name]
-	if err != false {
+	if err {
 		return errors.New("name not registered")
 	}
 
@@ -96,7 +96,7 @@ func (c *Centre) Delete(name string, val *int8) error {
 	c.IsLock = true
 
 	index, err := c.Index[name]
-	if err != false {
+	if err {
 		return errors.New("name not registered")
 	}
 
@@ -137,7 +137,7 @@ func (c *Centre) CheckTimeOut(name string, val *int8) error {
 	}
 	for i := 0; i < len(c.Service); i++ {
 		c.Mutex.Lock()
-		if c.Service[i].isLive == true {
+		if c.Service[i].isLive {
 			c.Service[i].timeOut++
 		}
 		c.Mutex.Unlock()
