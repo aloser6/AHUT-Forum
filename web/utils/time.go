@@ -4,17 +4,19 @@ import (
 	"container/list"
 	"errors"
 	"sync"
+	"time"
 )
 
 type TimerTask struct {
-	Time     int32  //倒计时的时间
-	RealTime int32  //相对时间
+	Time     int64  `default:"1e9"` //倒计时的时间
+	RealTime int64  //相对时间
 	Task     func() //到时间后需要执行的任务(回调函数)
 }
 
 type Timer struct {
-	TimeList *list.List   //存储定时器
-	Mutex    sync.RWMutex //读写锁
+	TimeList     *list.List   //存储定时器
+	Mutex        sync.RWMutex //读写锁
+	hertBeatTime int32        `default:"1e9"`
 }
 
 /*功能:添加定时任务
@@ -45,7 +47,7 @@ func (t *Timer) AddTimerTask(args *TimerTask, val *int8) error {
 // 暂且只支持最小粒度为1s的心跳，待突破
 func (t *Timer) findLowerBound(task *TimerTask) (*list.Element, error) { //可算法优化
 	if task != nil && task.Time < 0 {
-		//TODO执行
+		go task.Task()
 	}
 
 	t.Mutex.Lock()
@@ -60,7 +62,7 @@ func (t *Timer) findLowerBound(task *TimerTask) (*list.Element, error) { //可�
 	}
 
 	//中间
-	var last int32 = 0
+	var last int64 = 0
 	for i := t.TimeList.Front(); i != t.TimeList.Back(); i = i.Next() {
 		current, ok := i.Value.(*TimerTask)
 		if ok {
@@ -80,13 +82,32 @@ func (t *Timer) findLowerBound(task *TimerTask) (*list.Element, error) { //可�
 	return nil, nil
 }
 
-// func (t *Timer) ExecTimer() (int32, error) {
-// }
+/*功能:执行定时器
+ *参1:服务名称
+ **/
+func (t *Timer) ExecTimer(serviceName string) error {
+	timer := time.NewTimer(time.Duration(t.hertBeatTime))
+	for {
+		nextTime := t.TimeList.Front().Value.(TimerTask)
+		timer.Reset(time.Duration(nextTime.RealTime))
+		<-timer.C //等1s
+
+		t.Mutex.Lock() //如果等待过长时间怎么办？？
+		task := t.TimeList.Front().Value.(TimerTask)
+		t.TimeList.Remove(t.TimeList.Front())
+		rpcs := Rpcer{}
+		var val int8
+		t.AddTimerTask(&TimerTask{1, 0, func() { rpcs.Call("127.0.0.1:8080", "Centre.HertBeat", serviceName, &val) }}, &val) //ip:port等配置系统优化
+		t.Mutex.Unlock()
+
+		go task.Task()
+	}
+}
 
 // 待突破部分
 // if i == t.TimeList.Front() {
 // 	times, err := t.SignalTime() //insertFront()//current.RealTime -= //已经运行的时间
-// 	if err != nil {
+// 	if err != nil {s
 // 		return nil, errors.New("SignalTime fail")
 // 	}
 // 	current.RealTime -= times

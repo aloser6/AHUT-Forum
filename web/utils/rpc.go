@@ -32,7 +32,7 @@ func (r *Rpcer) Register(class interface{}) error {
  *参3:返回值(使用指针/结构体指针)
  *参4:参数(变长)
  **/
-func (r *Rpcer) Call(iport string, funName string, val interface{}, args interface{}) error {
+func (r *Rpcer) Call(iport string, funName string, args interface{}, val interface{}) error {
 	if iport == "" || funName == "" {
 		return errors.New("invalid args")
 	}
