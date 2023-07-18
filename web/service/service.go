@@ -67,8 +67,8 @@ func (c *Centre) Discover(name string, val *Service) error { //读写锁
 	//读锁
 	c.Mutex.RLock()
 	defer c.Mutex.RUnlock()
-	index, err := c.Index[name]
-	if err {
+	index, ok := c.Index[name]
+	if ok {
 		return errors.New("name not registered")
 	}
 
@@ -95,8 +95,8 @@ func (c *Centre) Delete(name string, val *int8) error {
 	defer c.Mutex.Unlock()
 	c.IsLock = true
 
-	index, err := c.Index[name]
-	if err {
+	index, ok := c.Index[name]
+	if ok {
 		return errors.New("name not registered")
 	}
 
@@ -118,8 +118,8 @@ func (c *Centre) HertBeat(name string, val *int8) error {
 
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
-	i, err := c.Index[name]
-	if err {
+	i, ok := c.Index[name]
+	if ok {
 		return errors.New("name not registered")
 	}
 	c.Service[i].timeOut = 0

@@ -37,7 +37,7 @@ func (t *Timer) AddTimerTask(args *TimerTask, val *int8) error {
 
 	err := t.insertTask(args)
 	if err != nil {
-		return errors.New("insertTask fail")
+		return err
 	}
 
 	return nil
