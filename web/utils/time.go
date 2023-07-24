@@ -3,8 +3,6 @@ package utils
 import (
 	"container/list"
 	"errors"
-	"fmt"
-	"os"
 	"sync"
 	"time"
 )
@@ -101,7 +99,8 @@ func (t *Timer) ExecTimer(serviceName string) error {
 		t.TimeList = new(list.List)
 	}
 	t.AddTimerTask(&TimerTask{1, 0, func() {
-		fmt.Fprintln(os.Stdout, "1 second1") /*rpcs.Call("127.0.0.1:8080", "Centre.HertBeat", serviceName, &val)*/
+		rpcs := new(Rpcer)
+		rpcs.Call("127.0.0.1:8080", "Centre.HertBeat", serviceName, &val)
 	}}, &val) //ip:port等配置系统优化
 
 	for {
@@ -111,7 +110,7 @@ func (t *Timer) ExecTimer(serviceName string) error {
 		}
 		timer.Reset(time.Duration(nextTime.RealTime * int64(time.Second)))
 		<-timer.C //等1s
-		fmt.Println(".")
+		//fmt.Println(".")
 
 		t.Mutex.Lock() //如果等待过长时间怎么办？？
 		temp, ok := t.TimeList.Front().Value.(*TimerTask)
@@ -140,7 +139,8 @@ func (t *Timer) ExecTimer(serviceName string) error {
 
 		t.Mutex.Unlock()
 		t.AddTimerTask(&TimerTask{1, 0, func() {
-			fmt.Fprintln(os.Stdout, "1 second2") /*rpcs.Call("127.0.0.1:8080", "Centre.HertBeat", serviceName, &val)*/
+			rpcs := new(Rpcer)
+			rpcs.Call("127.0.0.1:8080", "Centre.HertBeat", serviceName, &val)
 		}}, &val) //ip:port等配置系统优化
 
 	}
