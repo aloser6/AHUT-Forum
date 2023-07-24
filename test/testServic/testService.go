@@ -1,6 +1,7 @@
 package main
 
 import (
+	services "ISPS/web/service/src"
 	"ISPS/web/utils"
 	"fmt"
 	"log"
@@ -58,5 +59,12 @@ func testRpcClient() {
 }
 
 func testService() {
-
+	var val *int8
+	rpcs := new(utils.Rpcer)
+	err := rpcs.Call("127.0.0.1:8080", "Centre.Register", services.Service{Sname: "123", Ip: "127.0.0.1", Port: 8080}, val)
+	if err != nil {
+		fmt.Println(err)
+	}
+	times := new(utils.Timer)
+	times.ExecTimer("123")
 }
