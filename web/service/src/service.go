@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"errors"
@@ -35,6 +35,9 @@ func (c *Centre) Register(args Service, val *int8) error { //参数优化val
 	}
 	if args.isLive {
 		return errors.New("already registered service")
+	}
+	if c.Index == nil {
+		c.Index = make(map[string]int, 50)
 	}
 
 	//写锁
@@ -118,6 +121,7 @@ func (c *Centre) HertBeat(name string, val *int8) error {
 
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
+	//fmt.Println(".")
 	i, ok := c.Index[name]
 	if ok {
 		return errors.New("name not registered")
