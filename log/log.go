@@ -1,6 +1,7 @@
 package log
 
 import (
+	"ISPS/config"
 	"errors"
 	"fmt"
 	"os"
@@ -46,8 +47,9 @@ type consoleFileLogger struct {
  *参3：文件名称
  *参4：文件最大容量
  */
-func NewLog(levelstr, fp, fn string, maxFileSize int64) *consoleFileLogger {
-	level, err := parseLogLevel(levelstr)
+func NewLog() *consoleFileLogger {
+	y := config.Yaml{}
+	level, err := parseLogLevel(y.ReadYamlString("log.levelstr"))
 	if err != nil {
 		panic(err)
 	}
@@ -57,9 +59,9 @@ func NewLog(levelstr, fp, fn string, maxFileSize int64) *consoleFileLogger {
 		},
 		filelogger: &fileLogger{
 			level:       level,
-			filePath:    fp,
-			fileName:    fn,
-			maxFileSize: maxFileSize,
+			filePath:    y.ReadYamlString("log.fg"),
+			fileName:    y.ReadYamlString("log.fn"),
+			maxFileSize: y.ReadYamlInt64("log.maxFileSize"),
 			logChan:     make(chan *logMsg, 50000),
 		},
 	}
@@ -77,7 +79,7 @@ func NewLog(levelstr, fp, fn string, maxFileSize int64) *consoleFileLogger {
  */
 func (f *consoleFileLogger) Info(format, wher string) {
 	if wher == "filepath" || wher == "" {
-		f.filelogger.log(DEBUG, format)
+		f.filelogger.log(INFO, format)
 	}
 	if wher == "consolepath" {
 		f.consolelogger.log(INFO, format)
