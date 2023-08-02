@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -12,10 +13,16 @@ type Yaml struct {
 }
 
 //查询
-func (y *Yaml) ReadYaml(Key string) string { //Key 路径
+func (y *Yaml) ReadYamlString(Key string) string { //Key 路径
 	config := viper.New()
 	InitReadconfig(config)
 	return config.GetString(Key)
+}
+
+func (y *Yaml) ReadYamlInt64(Key string) int64 { //Key 路径
+	config := viper.New()
+	InitReadconfig(config)
+	return config.GetInt64(Key)
 }
 
 /*可以完成增，删，改
@@ -23,7 +30,7 @@ func (y *Yaml) ReadYaml(Key string) string { //Key 路径
 如果输入的value为空则删除
 如果输入的key存在则修改
 */
-func (y *Yaml) SetYaml(Key string, Value string) { //Key 路径 Value值
+func (y *Yaml) SetYaml(Key, Value string) { //Key 路径 Value值
 	config := viper.New()
 	InitReadconfig(config)
 	config.Set(Key, Value)
@@ -42,7 +49,8 @@ func InitReadconfig(config *viper.Viper) {
 	config.SetConfigFile("/home/kasadin/go_test/zhangchi/ISPS/config.yaml") //yaml文件的绝对路径
 	err := config.ReadInConfig()
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("ReadInConfig Error: %v", err)
+		//fmt.Println(err)
 		return
 	}
 }
@@ -60,7 +68,7 @@ var DB *gorm.DB
 
 //用于连接数据库
 func InitMySQL(y Yaml) *gorm.DB {
-	DB, err := gorm.Open(mysql.Open(y.ReadYaml("mysql.dsn")), &gorm.Config{})
+	DB, err := gorm.Open(mysql.Open(y.ReadYamlString("mysql.dsn")), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}

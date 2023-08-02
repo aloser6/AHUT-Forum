@@ -1,4 +1,9 @@
 mysql:
-    dsn: user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local
+    dsn: user:pass@tcp(127.0.0.1:3306)/mytest?charset=utf8mb4&parseTime=True&loc=Local
     user_name: 
     password:
+log:
+    levelstr: unknown
+    fp: ./
+    fn: tangbLog.log    
+    maxFileSize: 1024
