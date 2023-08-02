@@ -3,7 +3,7 @@ mysql:
     user_name: 
     password:
 log:
-    levelstr: unknown
-    fp: ./
+    levelstr: info
+    fp: ../../
     fn: tangbLog.log    
     maxFileSize: 1024
