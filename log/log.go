@@ -59,7 +59,7 @@ func NewLog() *consoleFileLogger {
 		},
 		filelogger: &fileLogger{
 			level:       level,
-			filePath:    y.ReadYamlString("log.fg"),
+			filePath:    y.ReadYamlString("log.fp"),
 			fileName:    y.ReadYamlString("log.fn"),
 			maxFileSize: y.ReadYamlInt64("log.maxFileSize"),
 			logChan:     make(chan *logMsg, 50000),
@@ -120,18 +120,20 @@ func (f *consoleFileLogger) Fatal(format, wher string) {
 
 // 往终端写日志相关内容
 func (c consoleLogger) enable(loglevel logLevel) bool {
-	if loglevel < 0 || loglevel > 5 {
-		errors.New("invalid loglevel")
+	if loglevel > 5 {
+		err := errors.New("invalid args")
+		fmt.Println(err)
 	}
 	return c.level <= loglevel
 }
 
 func (c consoleLogger) log(lv logLevel, format string) {
-	if lv < 0 || lv > 5 {
-		errors.New("invalid lv")
+	if lv > 5 {
+		err := errors.New("invalid args")
+		fmt.Println(err)
 	}
 	if c.enable(lv) {
-		msg := fmt.Sprintf(format)
+		msg := format
 		funcName, fileName, lineNum := getInfo(3)
 		now := time.Now().Format("2006/01/02 15:04:05")
 		fmt.Printf("[%s] [%s] [%s:%s:%d] %s\n", now, getLogString(lv), funcName, fileName, lineNum, msg)
@@ -140,19 +142,21 @@ func (c consoleLogger) log(lv logLevel, format string) {
 
 // 往文件里面写日志相关代码
 func (f *fileLogger) enable(loglevel logLevel) bool {
-	if loglevel < 0 || loglevel > 5 {
-		errors.New("invalid loglevel")
+	if loglevel > 5 {
+		err := errors.New("invalid args")
+		fmt.Println(err)
 	}
 	return f.level <= loglevel
 }
 
 // 记录日志方法
 func (f *fileLogger) log(lv logLevel, format string) {
-	if lv < 0 || lv > 5 {
-		errors.New("invalid lv")
+	if lv > 5 {
+		err := errors.New("invalid args")
+		fmt.Println(err)
 	}
 	if f.enable(lv) {
-		msg := fmt.Sprintf(format)
+		msg := format
 		funcName, fileName, lineNum := getInfo(3)
 		now := time.Now().Format("2006/01/02 15:04:05")
 		// 造一个logMsg对象
@@ -194,10 +198,10 @@ func (f *fileLogger) initFile() (err error) {
 }
 
 // 关闭连接
-func (f *fileLogger) close() {
-	f.fileObj.Close()
-	f.errFileObj.Close()
-}
+// func (f *fileLogger) close() {
+// 	f.fileObj.Close()
+// 	f.errFileObj.Close()
+// }
 
 // 判断文件大小，若判断时打不开文件，就再打开一次
 func (f *fileLogger) checkSize(file *os.File) bool {
@@ -261,11 +265,11 @@ func (f *fileLogger) writeLogBackground() error {
 		select {
 		case logTmp := <-f.logChan:
 			logInfo := fmt.Sprintf("[%s] [%s] [%s:%s:%d] %s\n", logTmp.timeStamp, getLogString(logTmp.level), logTmp.funcName, logTmp.fileName, logTmp.line, logTmp.msg)
-			fmt.Fprintf(f.fileObj, logInfo)
+			fmt.Fprintf(f.fileObj, "%s", logInfo)
 
-			if logTmp.level > ERROR {
+			if logTmp.level >= ERROR {
 				// 如果要记录的日志大于等于ERROR级别，我还要在err日志中再记录一遍
-				fmt.Fprintf(f.errFileObj, logInfo)
+				fmt.Fprintf(f.errFileObj, "%s", logInfo)
 			}
 		default:
 			// fmt.Println("--------取不到日志，缓5毫毛")
@@ -273,7 +277,6 @@ func (f *fileLogger) writeLogBackground() error {
 			time.Sleep(time.Millisecond * 500)
 		}
 	}
-	return nil
 }
 
 type logLevel uint16
