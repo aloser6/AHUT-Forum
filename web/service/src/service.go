@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 )
@@ -54,7 +55,7 @@ func (c *Centre) Register(args Service, val *int8) error { //参数优化val
 	c.Index[args.Sname] = len(c.Service) - 1
 	c.Service[c.Index[args.Sname]].isLive = true
 	c.IsLock = false
-
+	fmt.Println(args.Sname, " ", c.Index[args.Sname])
 	return nil
 }
 
@@ -123,7 +124,7 @@ func (c *Centre) HertBeat(name string, val *int8) error {
 	defer c.Mutex.Unlock()
 	//fmt.Println(".")
 	i, ok := c.Index[name]
-	if ok {
+	if !ok {
 		return errors.New("name not registered")
 	}
 	c.Service[i].timeOut = 0

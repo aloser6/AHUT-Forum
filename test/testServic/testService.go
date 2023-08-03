@@ -59,9 +59,9 @@ func testRpcClient() {
 }
 
 func testService() {
-	var val *int8
+	var val int8
 	rpcs := new(utils.Rpcer)
-	err := rpcs.Call("127.0.0.1:8080", "Centre.Register", services.Service{Sname: "123", Ip: "127.0.0.1", Port: 8080}, val)
+	err := rpcs.Call("127.0.0.1:8080", "Centre.Register", services.Service{Sname: "123", Ip: "127.0.0.1", Port: 8080}, &val) //避坑，最后一个参数必须式&val类型，不能直接传指针
 	if err != nil {
 		fmt.Println(err)
 	}
