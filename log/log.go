@@ -1,6 +1,7 @@
 package log
 
 import (
+	"ISPS/config"
 	"errors"
 	"fmt"
 	"os"
@@ -40,9 +41,15 @@ type consoleFileLogger struct {
 	filelogger    *fileLogger
 }
 
-// 构造函数
-func NewLog(levelstr, fp, fn string, maxFileSize int64) *consoleFileLogger {
-	level, err := parseLogLevel(levelstr)
+/*功能：构造函数
+ *参1：日志等级
+ *参2：文件路径
+ *参3：文件名称
+ *参4：文件最大容量
+ */
+func NewLog() *consoleFileLogger {
+	y := config.Yaml{}
+	level, err := parseLogLevel(y.ReadYamlString("log.levelstr"))
 	if err != nil {
 		panic(err)
 	}
@@ -52,9 +59,9 @@ func NewLog(levelstr, fp, fn string, maxFileSize int64) *consoleFileLogger {
 		},
 		filelogger: &fileLogger{
 			level:       level,
-			filePath:    fp,
-			fileName:    fn,
-			maxFileSize: maxFileSize,
+			filePath:    y.ReadYamlString("log.fp"),
+			fileName:    y.ReadYamlString("log.fn"),
+			maxFileSize: y.ReadYamlInt64("log.maxFileSize"),
 			logChan:     make(chan *logMsg, 50000),
 		},
 	}
@@ -260,7 +267,7 @@ func (f *fileLogger) writeLogBackground() error {
 			logInfo := fmt.Sprintf("[%s] [%s] [%s:%s:%d] %s\n", logTmp.timeStamp, getLogString(logTmp.level), logTmp.funcName, logTmp.fileName, logTmp.line, logTmp.msg)
 			fmt.Fprintf(f.fileObj, "%s", logInfo)
 
-			if logTmp.level > ERROR {
+			if logTmp.level >= ERROR {
 				// 如果要记录的日志大于等于ERROR级别，我还要在err日志中再记录一遍
 				fmt.Fprintf(f.errFileObj, "%s", logInfo)
 			}

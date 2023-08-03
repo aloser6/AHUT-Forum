@@ -1,0 +1,8 @@
+[2023/08/02 18:05:22] [ERROR] [main:testLog.go:30] 这是一条Error日志
+[2023/08/02 18:05:22] [FATAL] [main:testLog.go:31] 这是一条Fatal日志
+[2023/08/02 18:05:23] [ERROR] [main:testLog.go:30] 这是一条Error日志
+[2023/08/02 18:05:23] [FATAL] [main:testLog.go:31] 这是一条Fatal日志
+[2023/08/02 18:05:24] [ERROR] [main:testLog.go:30] 这是一条Error日志
+[2023/08/02 18:05:24] [FATAL] [main:testLog.go:31] 这是一条Fatal日志
+[2023/08/02 18:05:25] [ERROR] [main:testLog.go:30] 这是一条Error日志
+[2023/08/02 18:05:25] [FATAL] [main:testLog.go:31] 这是一条Fatal日志
