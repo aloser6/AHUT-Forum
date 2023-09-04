@@ -5,8 +5,6 @@ import (
 	"log"
 
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 type Yaml struct {
@@ -62,15 +60,4 @@ func InitSetconfig(config *viper.Viper) {
 		fmt.Println(err)
 		return
 	}
-}
-
-var DB *gorm.DB
-
-//用于连接数据库
-func InitMySQL(y Yaml) *gorm.DB {
-	DB, err := gorm.Open(mysql.Open(y.ReadYamlString("mysql.dsn")), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	return DB
 }
