@@ -1,7 +1,12 @@
 mysql:
-    dsn: user:pass@tcp(127.0.0.1:3306)/mytest?charset=utf8mb4&parseTime=True&loc=Local
-    user_name: 
-    password:
+    user:
+        dsn: root:myroot@tcp(127.0.0.1:3306)/user?charset=utf8mb4&parseTime=True&loc=Local
+    plate: 
+        dsn: root:myroot@tcp(127.0.0.1:3306)/plate?charset=utf8mb4&parseTime=True&loc=Local
+    post: 
+        dsn: root:myroot@tcp(127.0.0.1:3306)/post?charset=utf8mb4&parseTime=True&loc=Local
+    permission: 
+        dsn: root:myroot@tcp(127.0.0.1:3306)/permission?charset=utf8mb4&parseTime=True&loc=Local
 log:
     levelstr: info
     fp: ../../
