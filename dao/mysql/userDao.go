@@ -284,10 +284,12 @@ func (u *UserDB) DeleteConcernPlates(cp *ConcernPlates, PlateId int) bool {
 }
 
 func (u *UserDB) SelectUserFans(uf *UserFans, FansId int) bool {
+
 	u.db = Init("user")
 	err := u.db.Where("account_id", uf.AccountId).Find(&uf).Error
 	if err != nil {
-		fmt.Print(err)
+		str := err.Error()
+		fmt.Print(str)
 	}
 	//fmt.Println(cp.ConcernPlatesID)
 	if (FansId-1)/8+1 > len(uf.FansID)/3 {

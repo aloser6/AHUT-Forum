@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ISPS/web/dao/mysql"
+	"ISPS/dao/mysql"
 	"fmt"
 )
 
@@ -50,7 +50,7 @@ func main() {
 	if user.SelectConcernPlate(&cp, 1) {
 		fmt.Println(1)
 	}
-	user.InsertConcernPlate(&cp, 19)
+	//user.InsertConcernPlate(&cp, 19)
 	//10010011 10000001 00000111
 	accounts := user.SelectAllConcernPlates(&cp)
 	for i := 0; i < cp.ConcernPlatesNumber; i++ {
