@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"fmt"
+	"ISPS/log"
 	"strconv"
 
 	"gorm.io/gorm"
@@ -12,10 +12,11 @@ type PlateDB struct {
 }
 
 func (p *PlateDB) SelectPlateFans(pf *PlateFans, FansId int) bool {
+	log1 := log.NewLog()
 	p.db = Init("plate")
 	err := p.db.Where("plate_id", pf.PlateId).Find(&pf).Error
 	if err != nil {
-		fmt.Print(err)
+		log1.Error(err.Error(), "")
 	}
 	//fmt.Println(cp.ConcernPlatesID)
 	if (FansId-1)/8+1 > len(pf.FansID)/3 {
@@ -24,7 +25,7 @@ func (p *PlateDB) SelectPlateFans(pf *PlateFans, FansId int) bool {
 	cpids := pf.FansID[((FansId-1)/8+1)*3-3 : ((FansId-1)/8+1)*3]
 	s, err := strconv.Atoi(cpids)
 	if err != nil {
-		fmt.Println(err)
+		log1.Error(err.Error(), "")
 	}
 	if 1<<((FansId-1)%8)&s != 0 {
 		return true
@@ -33,10 +34,11 @@ func (p *PlateDB) SelectPlateFans(pf *PlateFans, FansId int) bool {
 }
 
 func (p *PlateDB) SelectAllPlateFans(pf *PlateFans) []int {
+	log1 := log.NewLog()
 	p.db = Init("plate")
 	err := p.db.Where("plate_id", pf.PlateId).Find(&pf).Error
 	if err != nil {
-		fmt.Print(err)
+		log1.Error(err.Error(), "")
 	}
 	//fmt.Println(cp.ConcernPlatesID)
 	platefans := make([]int, pf.FansNumber)
@@ -44,8 +46,8 @@ func (p *PlateDB) SelectAllPlateFans(pf *PlateFans) []int {
 	for i := 0; i < len(pf.FansID)/3; i++ {
 		s := pf.FansID[3*i : 3*i+3]
 		i2, err2 := strconv.Atoi(s)
-		if err != nil {
-			fmt.Println(err2)
+		if err2 != nil {
+			log1.Error(err2.Error(), "")
 		}
 		for j := 1; j <= 8 && i2 > 0; j++ {
 			if i2&1 != 0 {
@@ -59,10 +61,11 @@ func (p *PlateDB) SelectAllPlateFans(pf *PlateFans) []int {
 }
 
 func (p *PlateDB) InsertPlateFans(pf *PlateFans, FansId int) int {
+	log1 := log.NewLog()
 	p.db = Init("plate")
 	err := p.db.Where("plate_id", pf.PlateId).Find(&pf).Error
 	if err != nil {
-		fmt.Print(err)
+		log1.Error(err.Error(), "")
 	}
 	l := (FansId-1)/8 + 1
 	cpid_len := len(pf.FansID) / 3
@@ -81,14 +84,14 @@ func (p *PlateDB) InsertPlateFans(pf *PlateFans, FansId int) int {
 		pf.FansNumber = pf.FansNumber + 1
 		err := p.db.Where("plate_id=?", pf.PlateId).Updates(&pf).Error
 		if err != nil {
-			fmt.Print(err)
+			log1.Error(err.Error(), "")
 		}
 		return 2
 	} else {
 		cpids := pf.FansID[((FansId-1)/8+1)*3-3 : ((FansId-1)/8+1)*3]
 		s, err := strconv.Atoi(cpids)
 		if err != nil {
-			fmt.Println(err)
+			log1.Error(err.Error(), "")
 		}
 		if where&s != 0 {
 			return 1 //已存在
@@ -103,8 +106,8 @@ func (p *PlateDB) InsertPlateFans(pf *PlateFans, FansId int) int {
 			pf.FansID = pf.FansID[0:((FansId-1)/8+1)*3-3] + s2 + pf.FansID[((FansId-1)/8+1)*3:]
 			pf.FansNumber = pf.FansNumber + 1
 			err1 := p.db.Where("plate_id=?", pf.PlateId).Updates(&pf).Error
-			if err != nil {
-				fmt.Print(err1)
+			if err1 != nil {
+				log1.Error(err1.Error(), "")
 			}
 			return 2
 		}
@@ -112,10 +115,11 @@ func (p *PlateDB) InsertPlateFans(pf *PlateFans, FansId int) int {
 }
 
 func (p *PlateDB) DeletePlateFans(pf *PlateFans, FansId int) bool {
+	log1 := log.NewLog()
 	p.db = Init("plate")
 	err := p.db.Where("plate_id", pf.PlateId).Find(&pf).Error
 	if err != nil {
-		fmt.Print(err)
+		log1.Error(err.Error(), "")
 	}
 	if (FansId-1)/8+1 > len(pf.FansID)/3 {
 		return false //不存在
@@ -123,7 +127,7 @@ func (p *PlateDB) DeletePlateFans(pf *PlateFans, FansId int) bool {
 	cpids := pf.FansID[((FansId-1)/8+1)*3-3 : ((FansId-1)/8+1)*3]
 	s, err := strconv.Atoi(cpids)
 	if err != nil {
-		fmt.Println(err)
+		log1.Error(err.Error(), "")
 	}
 	if 1<<((FansId-1)%8)&s != 0 {
 		s = s & (^(1 << ((FansId - 1) % 8)))
@@ -138,7 +142,7 @@ func (p *PlateDB) DeletePlateFans(pf *PlateFans, FansId int) bool {
 		pf.FansNumber = pf.FansNumber - 1
 		err := p.db.Where("plate_id=?", pf.PlateId).Updates(&pf).Error
 		if err != nil {
-			fmt.Print(err)
+			log1.Error(err.Error(), "")
 		}
 		return true
 	}
@@ -146,10 +150,11 @@ func (p *PlateDB) DeletePlateFans(pf *PlateFans, FansId int) bool {
 }
 
 func (p *PlateDB) SelectEasyManage(em *EasyManage, ManageId int) bool {
+	log1 := log.NewLog()
 	p.db = Init("plate")
 	err := p.db.Where("plate_id", em.PlateId).Find(&em).Error
 	if err != nil {
-		fmt.Print(err)
+		log1.Error(err.Error(), "")
 	}
 	//fmt.Println(cp.ConcernPlatesID)
 	if (ManageId-1)/8+1 > len(em.ManageID)/3 {
@@ -158,7 +163,7 @@ func (p *PlateDB) SelectEasyManage(em *EasyManage, ManageId int) bool {
 	cpids := em.ManageID[((ManageId-1)/8+1)*3-3 : ((ManageId-1)/8+1)*3]
 	s, err := strconv.Atoi(cpids)
 	if err != nil {
-		fmt.Println(err)
+		log1.Error(err.Error(), "")
 	}
 	if 1<<((ManageId-1)%8)&s != 0 {
 		return true
@@ -167,10 +172,11 @@ func (p *PlateDB) SelectEasyManage(em *EasyManage, ManageId int) bool {
 }
 
 func (p *PlateDB) SelectAllEasyManage(em *EasyManage) []int {
+	log1 := log.NewLog()
 	p.db = Init("plate")
 	err := p.db.Where("plate_id", em.PlateId).Find(&em).Error
 	if err != nil {
-		fmt.Print(err)
+		log1.Error(err.Error(), "")
 	}
 	//fmt.Println(cp.ConcernPlatesID)
 	easymanage := make([]int, em.ManageNumber)
@@ -178,8 +184,8 @@ func (p *PlateDB) SelectAllEasyManage(em *EasyManage) []int {
 	for i := 0; i < len(em.ManageID)/3; i++ {
 		s := em.ManageID[3*i : 3*i+3]
 		i2, err2 := strconv.Atoi(s)
-		if err != nil {
-			fmt.Println(err2)
+		if err2 != nil {
+			log1.Error(err2.Error(), "")
 		}
 		for j := 1; j <= 8 && i2 > 0; j++ {
 			if i2&1 != 0 {
@@ -193,10 +199,11 @@ func (p *PlateDB) SelectAllEasyManage(em *EasyManage) []int {
 }
 
 func (p *PlateDB) InsertEasyManage(em *EasyManage, ManageId int) int {
+	log1 := log.NewLog()
 	p.db = Init("plate")
 	err := p.db.Where("plate_id", em.PlateId).Find(&em).Error
 	if err != nil {
-		fmt.Print(err)
+		log1.Error(err.Error(), "")
 	}
 	l := (ManageId-1)/8 + 1
 	cpid_len := len(em.ManageID) / 3
@@ -215,14 +222,14 @@ func (p *PlateDB) InsertEasyManage(em *EasyManage, ManageId int) int {
 		em.ManageNumber = em.ManageNumber + 1
 		err := p.db.Where("plate_id=?", em.PlateId).Updates(&em).Error
 		if err != nil {
-			fmt.Print(err)
+			log1.Error(err.Error(), "")
 		}
 		return 2
 	} else {
 		cpids := em.ManageID[((ManageId-1)/8+1)*3-3 : ((ManageId-1)/8+1)*3]
 		s, err := strconv.Atoi(cpids)
 		if err != nil {
-			fmt.Println(err)
+			log1.Error(err.Error(), "")
 		}
 		if where&s != 0 {
 			return 1 //已存在
@@ -238,7 +245,7 @@ func (p *PlateDB) InsertEasyManage(em *EasyManage, ManageId int) int {
 			em.ManageNumber = em.ManageNumber + 1
 			err1 := p.db.Where("plate_id=?", em.PlateId).Updates(&em).Error
 			if err1 != nil {
-				fmt.Print(err1)
+				log1.Error(err1.Error(), "")
 			}
 			return 2
 		}
@@ -246,10 +253,11 @@ func (p *PlateDB) InsertEasyManage(em *EasyManage, ManageId int) int {
 }
 
 func (p *PlateDB) DeleteEasyManage(em *EasyManage, ManageId int) bool {
+	log1 := log.NewLog()
 	p.db = Init("plate")
 	err := p.db.Where("plate_id", em.PlateId).Find(&em).Error
 	if err != nil {
-		fmt.Print(err)
+		log1.Error(err.Error(), "")
 	}
 	if (ManageId-1)/8+1 > len(em.ManageID)/3 {
 		return false //不存在
@@ -257,7 +265,7 @@ func (p *PlateDB) DeleteEasyManage(em *EasyManage, ManageId int) bool {
 	cpids := em.ManageID[((ManageId-1)/8+1)*3-3 : ((ManageId-1)/8+1)*3]
 	s, err := strconv.Atoi(cpids)
 	if err != nil {
-		fmt.Println(err)
+		log1.Error(err.Error(), "")
 	}
 	if 1<<((ManageId-1)%8)&s != 0 {
 		s = s & (^(1 << ((ManageId - 1) % 8)))
@@ -272,7 +280,7 @@ func (p *PlateDB) DeleteEasyManage(em *EasyManage, ManageId int) bool {
 		em.ManageNumber = em.ManageNumber - 1
 		err := p.db.Where("plate_id=?", em.PlateId).Updates(&em).Error
 		if err != nil {
-			fmt.Print(err)
+			log1.Error(err.Error(), "")
 		}
 		return true
 	}
