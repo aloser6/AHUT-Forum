@@ -33,7 +33,7 @@ CREATE TABLE `posts` (
 CREATE TABLE `comments` (
   `cid` bigint PRIMARY KEY AUTO_INCREMENT,
   `uid` int,
-  `pid` int,
+  `pid` bigint,
   `fathercid` bigint DEFAULT -1,
   `votes` int DEFAULT 0,
   `text` text NOT NULL,
