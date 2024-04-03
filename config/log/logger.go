@@ -1,7 +1,9 @@
 package logger
 
 import (
+	"fmt"
 	"log"
+	"os"
 )
 
 func Logger_init() {
@@ -10,27 +12,30 @@ func Logger_init() {
 
 func Info(format string, a ...any) {
 	log.SetPrefix("[INFO] ")
-	log.Printf(format, a...)
+	log.Output(2, fmt.Sprintf(format, a...))
 }
 func Debug(format string, a ...any) {
 	log.SetPrefix("[DEBUG] ")
-	log.Printf(format, a...)
+	log.Output(2, fmt.Sprintf(format, a...))
 }
 func Warn(format string, a ...any) {
 	log.SetPrefix("[WARN] ")
-	log.Printf(format, a...)
+	log.Output(2, fmt.Sprintf(format, a...))
 }
 func Error(err error) {
 	log.SetPrefix("[ERROR] ")
-	log.Fatal(err)
+	log.Output(2, err.Error())
+	os.Exit(1)
 }
 func Fatal(err error) {
 	log.SetPrefix("[FATAL] ")
-	log.Fatal(err)
+	log.Output(2, err.Error())
+	os.Exit(1)
 }
 func Assert(err error) {
 	if err != nil {
 		log.SetPrefix("[FATAL] ")
-		log.Fatal(err)
+		log.Output(2, err.Error())
+		os.Exit(1)
 	}
 }
