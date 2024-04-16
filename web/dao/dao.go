@@ -12,34 +12,32 @@ func Insert(newUser *models.User) {
 	user := newUser
 	db.Create(user)
 }
-func InsertLock() {
+func InsertLock(newUser *models.User) {
 	mysql.Mu.Lock()
-	Insert()
+	Insert(newUser)
 	mysql.Mu.Unlock()
 }
-func Updata(undatedUser *models.User) {
-	user := undatedUser
+func Updata(updatedUser *models.User) {
+	user := updatedUser
 	db.Save(user)
 }
-func Select(id uint) (*models.User, error) {
-	finduser := &models.User{}
-	var finduserId = finduser.ID
+func Select(id uint, findUser *models.User) (*models.User, error) {
+	findUserId := findUser.ID
 
-	err := db.First(finduserId, id).Error
+	err := db.First(findUserId, id).Error
 	if err != nil {
 		return nil, err
 	}
-	return finduser, nil
+	return findUser, nil
 
 }
-func SelectLock() {
+func SelectLock(id uint, findUser *models.User) {
 	mysql.Mu.RLock()
-	Select()
+	Select(id, findUser)
 	mysql.Mu.Unlock()
 }
-func Delete(id uint) {
-	deleteduser := &models.User{}
-	var userId = deleteduser.ID
+func Delete(id uint, deletedUser *models.User) {
+	userId := deletedUser.ID
 	userId = id
 
 	db.Delete(userId)
