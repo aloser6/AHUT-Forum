@@ -2,43 +2,56 @@ package dao
 
 import (
 	"AHUT-Forum/config"
-	"AHUT-Forum/models"
+	logger "AHUT-Forum/config/log"
 )
 
 var mysql = config.Mysql{}
 var db = mysql.Db
 
-func Insert(newUser *models.User) {
-	user := newUser
-	db.Create(user)
-}
-func InsertLock(newUser *models.User) {
-	mysql.Mu.Lock()
-	Insert(newUser)
-	mysql.Mu.Unlock()
-}
-func Updata(updatedUser *models.User) {
-	user := updatedUser
-	db.Save(user)
-}
-func Select(id uint, findUser *models.User) (*models.User, error) {
-	findUserId := findUser.ID
-
-	err := db.First(findUserId, id).Error
+//Insert
+func Insert(tablename string, model interface{}) error {
+	err := db.Table(tablename).Create(model).Error
 	if err != nil {
-		return nil, err
+		logger.Assert(err)
 	}
-	return findUser, nil
-
+	return err
 }
-func SelectLock(id uint, findUser *models.User) {
+
+func InsertLock(tablename string, model interface{}) {
 	mysql.Mu.RLock()
-	Select(id, findUser)
-	mysql.Mu.Unlock()
+	defer mysql.Mu.Unlock()
+	Insert(tablename, model)
 }
-func Delete(id uint, deletedUser *models.User) {
-	userId := deletedUser.ID
-	userId = id
 
-	db.Delete(userId)
+//Update
+func Updata(tablename string, model interface{}) error {
+	err := db.Table(tablename).Save(model).Error
+	if err != nil {
+		logger.Assert(err)
+	}
+	return err
+}
+
+//Select
+func Select(tableName string, id uint, model interface{}) error {
+	err := db.Table(tableName).First(model, id).Error
+	if err != nil {
+		logger.Assert(err)
+	}
+	return err
+}
+
+func SelectLock(tableName string, id uint, model interface{}) {
+	mysql.Mu.RLock()
+	defer mysql.Mu.Unlock()
+	Select(tableName, id, model)
+}
+
+//Delete
+func Delete(tableName string, model interface{}, id uint) error {
+	err := db.Table(tableName).Delete(model, id).Error
+	if err != nil {
+		logger.Assert(err)
+	}
+	return err
 }
