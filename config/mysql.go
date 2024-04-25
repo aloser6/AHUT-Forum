@@ -3,6 +3,7 @@ package config
 import (
 	logger "AHUT-Forum/config/log"
 	"fmt"
+	"sync"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -10,6 +11,7 @@ import (
 
 type Mysql struct {
 	Db *gorm.DB
+	Mu sync.RWMutex
 }
 
 func (mq *Mysql) Mysql_init(conf *Config) {
