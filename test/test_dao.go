@@ -1,53 +1,51 @@
 package main
 
 import (
-	"AHUT-Forum/models"
+	"AHUT-Forum/config"
 	"AHUT-Forum/web/dao"
+	"AHUT-Forum/web/models"
 	"fmt"
+	"time"
 )
 
 func test_dao() {
-	newUser := models.User{
-		Account:  12345,
-		Password: "password123",
-		Username: "wangwu",
-		Sex:      "男",
-		Grade:    "大一",
-		College:  "计算机学院",
-		Major:    "软件工程",
+	config := config.Config{}
+	config.Init()
+
+	// Test Insert
+	fmt.Println("测试插入...")
+	user := models.User{
+		Account:   123456,
+		Password:  "password123",
+		Username:  "Test User",
+		StartTime: time.Now(),
+		Sex:       models.Male,
+		Grade:     "Senior",
+		College:   "Test College",
+		Major:     "Test Major",
 	}
+	dao.Insert("users", &user)
+	fmt.Println("插入成功!")
 
-	//增
-	dao.Insert(&newUser)
-	fmt.Println("用户数据增加成功")
+	// Test Update
+	fmt.Println("测试更新...")
+	user.Username = "Updated Test User"
+	dao.Update("users", &user)
+	fmt.Println("更新成功!")
 
-	//改
-	updatedUser := models.User{
-		Account:  10086,
-		Password: "123password",
-		Username: "lixiang",
-		Sex:      "女",
-		Grade:    "大二",
-		College:  "材料科学与工程学院",
-		Major:    "无机非金属",
-	}
-	dao.Updata(&updatedUser)
-	fmt.Println("用户数据修改成功")
-
-	//查
-	id := uint(1)
-	findUser := models.User{}
-	resUser, err := dao.Select(id, &findUser)
-	if err != nil {
-		fmt.Printf("查询用户失败：%v\n", err)
+	// Test Select
+	fmt.Println("测试查询...")
+	selectedUser := models.User{}
+	records := dao.Select("users", uint(user.UID), &selectedUser)
+	if len(records) > 0 {
+		fmt.Println("Selected User:", selectedUser)
 	} else {
-		fmt.Printf("查询到的用户信息：%+v\n", resUser)
+		fmt.Println("未找到用户。")
 	}
+	fmt.Println("查询成功!")
 
-	//删
-	uid := uint(1)
-	deletedUser := models.User{}
-	dao.Delete(uid, &deletedUser)
-	fmt.Println("用户数据删除成功")
-
+	// Test Delete
+	fmt.Println("测试删除...")
+	dao.Delete("users", &user, uint(user.UID))
+	fmt.Println("删除成功!")
 }
