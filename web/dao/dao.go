@@ -1,12 +1,10 @@
 package dao
 
 import (
-	"AHUT-Forum/config"
 	logger "AHUT-Forum/config/log"
 )
 
-var mysql = config.Mysql{}
-var db = mysql.Db
+var db Mysql
 
 //Insert
 func Insert(tablename string, model interface{}) {
@@ -14,10 +12,10 @@ func Insert(tablename string, model interface{}) {
 		return
 	}
 
-	mysql.Mu.Lock()
-	defer mysql.Mu.Unlock()
+	db.Mu.Lock()
+	defer db.Mu.Unlock()
 
-	err := db.Table(tablename).Create(model).Error
+	err := db.Db.Table(tablename).Create(model).Error
 	logger.Assert(err)
 }
 
@@ -27,10 +25,10 @@ func Update(tablename string, model interface{}) {
 		return
 	}
 
-	mysql.Mu.Lock()
-	defer mysql.Mu.Unlock()
+	db.Mu.Lock()
+	defer db.Mu.Unlock()
 
-	err := db.Table(tablename).Save(model).Error
+	err := db.Db.Table(tablename).Save(model).Error
 	logger.Assert(err)
 }
 
@@ -40,11 +38,11 @@ func Select(tablename string, id uint, model interface{}) []interface{} {
 		return nil
 	}
 
-	mysql.Mu.RLock()
-	defer mysql.Mu.RUnlock()
+	db.Mu.RLock()
+	defer db.Mu.RUnlock()
 
 	var records []interface{}
-	err := db.Table(tablename).First(model, id).Error
+	err := db.Db.Table(tablename).First(model, id).Error
 	logger.Assert(err)
 	return records
 }
@@ -55,9 +53,9 @@ func Delete(tablename string, model interface{}, id uint) {
 		return
 	}
 
-	mysql.Mu.Lock()
-	defer mysql.Mu.Unlock()
+	db.Mu.Lock()
+	defer db.Mu.Unlock()
 
-	err := db.Table(tablename).Delete(model, id).Error
+	err := db.Db.Table(tablename).Delete(model, id).Error
 	logger.Assert(err)
 }
