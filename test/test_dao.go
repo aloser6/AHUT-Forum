@@ -1,7 +1,7 @@
 package main
 
 import (
-	"AHUT-Forum/config"
+	"AHUT-Forum/units"
 	"AHUT-Forum/web/dao"
 	"AHUT-Forum/web/models"
 	"fmt"
@@ -9,8 +9,7 @@ import (
 )
 
 func test_dao() {
-	config := config.Config{}
-	config.Init()
+	units.Init()
 
 	// Test Insert
 	fmt.Println("测试插入...")
@@ -20,7 +19,7 @@ func test_dao() {
 		Username:  "Test User",
 		StartTime: time.Now(),
 		Sex:       models.Male,
-		Grade:     "Senior",
+		Grade:     "21",
 		College:   "Test College",
 		Major:     "Test Major",
 	}
@@ -45,7 +44,7 @@ func test_dao() {
 	fmt.Println("查询成功!")
 
 	// Test Delete
-	fmt.Println("测试删除...")
-	dao.Delete("users", &user, uint(user.UID))
-	fmt.Println("删除成功!")
+	// fmt.Println("测试删除...")
+	// dao.Delete("users", &user, uint(user.UID))
+	// fmt.Println("删除成功!")
 }
