@@ -1,8 +1,9 @@
 package main
 
-import "AHUT-Forum/config"
+import (
+	"AHUT-Forum/units"
+)
 
 func test_config() {
-	conf := config.Config{}
-	conf.Init()
+	units.Init()
 }
