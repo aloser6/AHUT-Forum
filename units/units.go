@@ -1,12 +1,14 @@
 package units
 
 import (
-	"path"
-	"runtime"
+	"AHUT-Forum/config"
+	logger "AHUT-Forum/config/log"
+	"AHUT-Forum/web/dao"
 )
 
-func Get_root_path() string {
-	_, filename, _, _ := runtime.Caller(0)
-	root_path := path.Dir(path.Dir(filename))
-	return root_path
+func Init() {
+	logger.Logger_init()
+	conf := config.Config{}
+	conf.Config_init()
+	dao.Mysql_init(conf)
 }
