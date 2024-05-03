@@ -7,15 +7,15 @@ import (
 )
 
 func Init_route(r *gin.Engine) {
-	r.GET("/ahutforum/user/account/login", test_GET)
+	r.POST("/ahutforum/user/account/login", test_POST)
 }
 
 var body struct {
-	Account  int    `json:"account"`
+	Account  string `json:"account"`
 	Password string `json:"password"`
 }
 
-func test_GET(c *gin.Context) {
+func test_POST(c *gin.Context) {
 	//获取请求体的json数据
 	if err := c.BindJSON(&body); err != nil {
 		return
