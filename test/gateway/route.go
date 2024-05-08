@@ -11,7 +11,7 @@ func Init_route(r *gin.Engine) {
 }
 
 var body struct {
-	Account  string `json:"account"`
+	Account  int    `json:"account"`
 	Password string `json:"password"`
 }
 
