@@ -1,9 +1,14 @@
 package main
 
-import "AHUT-Forum/config"
+import (
+	"AHUT-Forum/config"
+	"AHUT-Forum/units"
+	"AHUT-Forum/web/dao"
+)
 
 func test_db() {
+	units.Init()
 	conf := config.Config{}
-	conf.Init()
-	_ = config.Mysql{}
+	conf.Config_init()
+	dao.Mysql_init(conf)
 }

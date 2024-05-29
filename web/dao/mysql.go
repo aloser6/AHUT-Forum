@@ -1,6 +1,7 @@
-package config
+package dao
 
 import (
+	"AHUT-Forum/config"
 	logger "AHUT-Forum/config/log"
 	"fmt"
 	"sync"
@@ -14,10 +15,13 @@ type Mysql struct {
 	Mu sync.RWMutex
 }
 
-func (mq *Mysql) Mysql_init(conf *Config) {
+func Mysql_init(conf config.Config) {
+	db = Mysql{}
 	var err error
 	url := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=True&loc=Local", conf.Mysql.Username, conf.Mysql.Password, conf.Mysql.Ip, conf.Mysql.Port, conf.Mysql.Dbname)
 	logger.Info(url)
-	mq.Db, err = gorm.Open(mysql.Open(url), &gorm.Config{})
+	if db.Db == nil {
+		db.Db, err = gorm.Open(mysql.Open(url), &gorm.Config{})
+	}
 	logger.Assert(err)
 }
